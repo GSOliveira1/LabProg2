@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct{
+typedef struct No{
     int info;
     struct No *prox;
 } No;
@@ -43,6 +43,82 @@ int insereInicio(Lista* lista, int elemento){
     novo->prox = *lista;
     *lista = novo;
     return 1;
+}
+
+int insereFim(Lista* lista, int elemento){
+    if (lista == NULL)
+        return 0;
+    No* novo = alocarNo();
+    if (novo == NULL)
+        return 0;
+    novo->info = elemento;
+    novo->prox = NULL;
+    if (listaVazia(lista)){
+        *lista = novo;
+    } else{
+        No* auxiliar = *lista;
+        while (auxiliar->prox != NULL)
+            auxiliar = auxiliar->prox;
+        auxiliar->prox = novo;
+    }
+    return 1;
+}
+
+int removeInicio(Lista* lista){
+    if (lista == NULL)
+        return 0;
+    if (listaVazia(lista))
+        return 0;
+    No* auxiliar = *lista;
+    *lista = auxiliar->prox;
+    liberarNo(auxiliar);
+    return 1;
+}
+
+int removeFim (Lista* lista){
+    if (lista == NULL)
+        return 0;
+    if (listaVazia(lista))
+        return 0;
+    No* anterior, *auxiliar = *lista;
+    while (auxiliar->prox != NULL){
+        anterior = auxiliar;
+        auxiliar = auxiliar->prox;
+    }
+    if (auxiliar == *lista)
+        *lista = auxiliar->prox;
+    else
+        anterior->prox = auxiliar->prox;
+    liberarNo(auxiliar);
+    return 1;
+}
+
+void imprimeLista(Lista* lista){
+    if (lista == NULL)
+        return;
+    if (listaVazia(lista)){
+        printf ("Lista vazia!\n");
+        return;
+    }
+    printf ("Elementos:\n");
+    No* auxiliar = *lista;
+    while (auxiliar != NULL){
+        printf ("%d ", auxiliar->info);
+        auxiliar = auxiliar->prox;
+    }
+    printf ("\n");
+}
+
+void destroiLista (Lista* lista){
+    if (lista != NULL){
+        No* auxiliar;
+        while ((*lista) != NULL){
+            auxiliar = *lista;
+            *lista = (*lista)->prox;
+            liberarNo(auxiliar);
+        }
+        free(lista);
+    }
 }
 
 #endif // LSEC_H

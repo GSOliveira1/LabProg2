@@ -2,20 +2,21 @@
 #include <stdlib.h>
 #include "lista_sequencial_estatica.h"
 
-int insereOrdenado(Lista* lista, int elemento){
-    if (lista == NULL || listaCheia(lista))
+int insereOrdenado(Lista* lista, int elemento) {
+    if (lista == NULL) 
         return 0;
-
-    int i;
-    for (i=0; i < tamanhoLista(lista) && lista->dados[i] < elemento; i++){
-        for (int j=lista->qtd; j >= i+1; j--){
-            lista->dados[j] = lista->dados[j-1];
+    if (!listaCheia(lista)){
+        for(int i=0; i <= lista->qtd; i++){
+            if (lista->dados[i] > elemento){
+                for(int j=lista->qtd; j > i; j--)
+                    lista->dados[j] = lista->dados[j-1];
+                lista->dados[i] = elemento;
+                lista->qtd++;
+                return 1;
+            }
         }
     }
-    lista->dados[i] = elemento;
-    lista->qtd++;
-
-    return 1;
+    return 0;    
 }
 
 int main(){

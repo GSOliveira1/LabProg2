@@ -3,9 +3,10 @@
 #include "lista_sequencial_estatica.h"
 
 int removePrimeiro(Lista* lista, int elemento){
-    if (lista == NULL || listaVazia(lista)){
+    if (lista == NULL)
         return 0;
-    }
+    if (listaVazia(lista))
+        return 0;
     
     int i;
     for (i=0; i < lista->qtd; i++){
@@ -32,6 +33,7 @@ int main(){
     insereFim(lista, 27);
     insereFim(lista, 19);
     insereFim(lista, 41);
+    insereFim(lista, 27);
 
     imprimeLista(lista);
     removePrimeiro(lista, 27);

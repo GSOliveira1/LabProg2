@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "deque_sequencial_estatico.h"
-// #include "deque_duplamente_encadeado.h"
+// #include "deque_sequencial_estatico.h"
+#include "deque_duplamente_encadeado.h"
 /*
 Esse arquivo funciona tanto para o Deque Sequencial Estático, quanto para o Deque Duplamente Encadeado.
 É necessário apenas importar a biblioteca que for utilizar
@@ -32,7 +32,7 @@ int main(){
             case 1:
                 if (deque != NULL){
                     destroiDeque(deque);
-                    printf ("Pilha resetada!\n");
+                    printf ("Deque resetado!\n");
                 }
                 deque = criaDeque();
                 break;
@@ -53,6 +53,7 @@ int main(){
                 } else{
                     printf ("Nao foi possivel adicionar!\n");
                 }
+                break;
             case 4:
                 if (verInicio(deque, &elemento)){
                     printf ("Inicio do Deque = %d\n", elemento);

@@ -148,7 +148,7 @@ Matriz* criaDiagonal(Matriz* matriz){
         printf ("Matriz nao quadrada!\n");
         return NULL;
     }
-    int i, j;
+    int i;
     Matriz* diagonal = criaMatriz(matriz->linha, matriz->coluna);
     for (i=0; i < matriz->linha; i++)
         diagonal->dados[i][i] = matriz->dados[i][i];

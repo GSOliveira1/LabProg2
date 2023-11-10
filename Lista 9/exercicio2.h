@@ -1,48 +1,57 @@
-#ifndef AVL_H
-#define AVL_H
+#ifndef EXERCICIO2_H
+#define EXERCICIO2_H
 #include <stdio.h>
 #include <stdlib.h>
+
 #define MAIOR(a, b) ((a > b) ? (a) : (b))
 
+typedef struct{
+    char nome[50];
+    int contratacao;
+    double salario;
+}Funcionario;
+
 typedef struct NO{
-    int info, fb, alt;
+    int fb, alt;
+    Funcionario funcionario;
     struct NO* esq;
     struct NO* dir;
 }NO;
 typedef struct NO* AVL;
 
-NO* alocarNO(){
-    return (NO*) malloc (sizeof(NO));
+NO* alocarNO() {
+    return (NO*)malloc(sizeof(NO));
 }
 
-void liberarNO(NO* q){
+void liberarNO(NO* q) {
     free(q);
 }
 
-AVL* criaAVL(){
-    AVL* raiz = (AVL*) malloc (sizeof(AVL));
-    if(raiz != NULL)
+AVL* criaAVL() {
+    AVL* raiz = (AVL*)malloc(sizeof(AVL));
+    if (raiz != NULL)
         *raiz = NULL;
     return raiz;
 }
 
-void destroiRec(NO* no){
-    if(no == NULL) return;
+void destroiRec(NO* no) {
+    if (no == NULL) return;
     destroiRec(no->esq);
     destroiRec(no->dir);
     liberarNO(no);
     no = NULL;
 }
 
-void destroiAVL(AVL* raiz){
-    if(raiz != NULL){
-        destroiRec(*raiz);
-        free(raiz);
+void destroiAVL(AVL** raiz) {
+    if (*raiz != NULL) {
+        destroiRec(**raiz);
+        free(*raiz);
+        *raiz = NULL;
     }
 }
 
-int estaVazia(AVL* raiz){
-    if(raiz == NULL) return 0;
+int estaVazia(AVL* raiz) {
+    if (raiz == NULL) return 0;
     return (*raiz == NULL);
 }
 
@@ -58,7 +67,7 @@ int altura(NO* raiz){
 
 int FB(NO* raiz){
     if(raiz == NULL) return 0;
-    printf("Calculando FB do (%d)..\n", raiz->info);
+    printf("Calculando FB do (%d)..\n", raiz->funcionario);
     return altura(raiz->esq) - altura(raiz->dir);
 }
 
@@ -183,20 +192,26 @@ void avl_AuxFD(NO **raiz){
      avl_RotDirEsq(raiz);
 }
 
-int insereRec(NO** raiz, int elem){
-    int ok; //Controle para as chamadas recursivas
-    if(*raiz == NULL){
+int insereRec(NO** raiz, Funcionario elemento){
+    int ok;
+    if (*raiz == NULL){
         NO* novo = alocarNO();
-        if(novo == NULL) return 0;
-        novo->info = elem; novo->fb = 0, novo->alt = 1;
-        novo->esq = NULL; novo->dir = NULL;
-        *raiz = novo; return 1;
-    }else{
-        if((*raiz)->info == elem){
-            printf("Elemento Existente!\n"); ok = 0;
+        if (novo == NULL)
+            return 0;
+        novo->funcionario = elemento;
+        novo->fb = 0;
+        novo->alt = 1;
+        novo->esq = NULL;
+        novo->dir = NULL;
+        *raiz = novo;
+        return 1;
+    } else{
+        if ((*raiz)->funcionario.salario == elemento.salario){
+            printf ("Elemento existente.\n");
+            ok = 0;
         }
-        if(elem < (*raiz)->info){
-            ok = insereRec(&(*raiz)->esq, elem);
+        if (elemento.salario < (*raiz)->funcionario.salario){
+            ok = insereRec(&(*raiz)->esq, elemento);
             if(ok){
                 switch((*raiz)->fb){
                     case -1:
@@ -209,9 +224,8 @@ int insereRec(NO** raiz, int elem){
                         avl_AuxFE(raiz); ok = 0; break;
                 }
             }
-        }
-        else if(elem > (*raiz)->info){
-            ok = insereRec(&(*raiz)->dir, elem);
+        }else if(elemento.salario > (*raiz)->funcionario.salario){
+            ok = insereRec(&(*raiz)->dir, elemento);
             if(ok){
                 switch((*raiz)->fb){
                     case +1:
@@ -227,60 +241,61 @@ int insereRec(NO** raiz, int elem){
     return ok;
 }
 
-int insereElem(AVL* raiz, int elem){
-    if(raiz == NULL) return 0;
-    return insereRec(raiz, elem);
+int insereElem(AVL* raiz, Funcionario elemento){
+    if(raiz == NULL) 
+        return 0;
+    return insereRec(raiz, elemento);
 }
 
-int pesquisaRec(NO** raiz, int elem){
+int pesquisaRec(NO** raiz, Funcionario elemento){
     if(*raiz == NULL) return 0;
-    if((*raiz)->info == elem) return 1;
-    if(elem < (*raiz)->info)
-        return pesquisaRec(&(*raiz)->esq, elem);
+    if((*raiz)->funcionario.salario == elemento.salario) return 1;
+    if(elemento.salario < (*raiz)->funcionario.salario)
+        return pesquisaRec(&(*raiz)->esq, elemento);
     else 
-        return pesquisaRec(&(*raiz)->dir, elem);
+        return pesquisaRec(&(*raiz)->dir, elemento);
 }
 
-int pesquisa(AVL* raiz, int elem){
+int pesquisa(AVL* raiz, Funcionario elemento){
     if(raiz == NULL) return 0;
     if(estaVazia(raiz)) return 0;
-    return pesquisaRec(raiz, elem);
+    return pesquisaRec(raiz, elemento);
 }
 
-int removeRec(NO** raiz, int elem){
+int removeRec(NO** raiz, Funcionario elemento){
     if(*raiz == NULL) return 0;
     int ok;
-    if((*raiz)->info == elem){
+    if((*raiz)->funcionario.salario == elemento.salario){
         NO* aux;
         if((*raiz)->esq == NULL && (*raiz)->dir == NULL){   //Caso 1 - NO sem filhos
-            printf("Caso 1: Liberando %d..\n", (*raiz)->info);
+            printf("Caso 1: Liberando %d..\n", (*raiz)->funcionario);
             liberarNO(*raiz);
             *raiz = NULL;
         }else if((*raiz)->esq == NULL){ //Caso 2.1 - Possui apenas uma subarvore direita
-            printf("Caso 2.1: Liberando %d..\n", (*raiz)->info);
+            printf("Caso 2.1: Liberando %d..\n", (*raiz)->funcionario);
             aux = *raiz;
             *raiz = (*raiz)->dir;
             liberarNO(aux);
         }else if((*raiz)->dir == NULL){ //Caso 2.2 - Possui apenas uma subarvore esquerda
-            printf("Caso 2.2: Liberando %d..\n", (*raiz)->info);
+            printf("Caso 2.2: Liberando %d..\n", (*raiz)->funcionario);
             aux = *raiz;
             *raiz = (*raiz)->esq;
             liberarNO(aux);
         }else{  //Caso 3 - Possui as duas subarvores (esq e dir)
             //3.1 - Substituir pelo NO com o MAIOR valor da subarvore esquerda
             //3.2 - Substituir pelo NO com o MENOR valor da subarvore direita
-            printf("Caso 3: Liberando %d..\n", (*raiz)->info);
+            printf("Caso 3: Liberando %d..\n", (*raiz)->funcionario);
             //Estrategia 3.1:
             NO* Filho = (*raiz)->esq;
             while(Filho->dir != NULL)   //Localiza o MAIOR valor da subarvore esquerda
                 Filho = Filho->dir;
-            (*raiz)->info = Filho->info;
-            Filho->info = elem;
-            return removeRec(&(*raiz)->esq, elem);
+            (*raiz)->funcionario = Filho->funcionario;
+            Filho->funcionario = elemento;
+            return removeRec(&(*raiz)->esq, elemento);
         }
         return 1;
-    }else if(elem < (*raiz)->info){
-        ok = removeRec(&(*raiz)->esq, elem); 
+    }else if(elemento.salario < (*raiz)->funcionario.salario){
+        ok = removeRec(&(*raiz)->esq, elemento); 
         if(ok){
             switch((*raiz)->fb){
                 case +1:
@@ -296,7 +311,7 @@ int removeRec(NO** raiz, int elem){
         }
     }
     else{ 
-        ok = removeRec(&(*raiz)->dir, elem);
+        ok = removeRec(&(*raiz)->dir, elemento);
         if(ok){
             switch((*raiz)->fb){
                 case -1:
@@ -314,36 +329,20 @@ int removeRec(NO** raiz, int elem){
     return ok;
 }
 
-int removeElem(AVL* raiz, int elem){
-    if(pesquisa(raiz, elem) == 0){
-        printf("Elemento inexistente!\n");
+int removeElem(AVL* raiz, Funcionario elemento){
+    if(pesquisa(raiz, elemento) == 0){
+        printf("Funcionario inexistente!\n");
         return 0;
     }
-    return removeRec(raiz, elem);
+    return removeRec(raiz, elemento);
 }
 
 void em_ordem(NO* raiz, int nivel){
     if(raiz != NULL){
         em_ordem(raiz->esq, nivel+1);
         //printf("[%d, %d, %d] ", raiz->info, raiz->fb, nivel);
-        printf("[%d, %d, %d, %d] ", raiz->info, raiz->fb, nivel, raiz->alt);
+        printf("[%d, %d, %d, %d] ", raiz->funcionario, raiz->fb, nivel, raiz->alt);
         em_ordem(raiz->dir, nivel+1);
-    }
-}
-
-void pre_ordem(NO* raiz, int nivel){
-    if(raiz != NULL){
-        printf("[%d, %d, %d] ", raiz->info, raiz->fb, nivel);
-        pre_ordem(raiz->esq, nivel+1);
-        pre_ordem(raiz->dir, nivel+1);
-    }
-}
-
-void pos_ordem(NO* raiz, int nivel){
-    if(raiz != NULL){
-        pos_ordem(raiz->esq, nivel+1);
-        pos_ordem(raiz->dir, nivel+1);
-        printf("[%d, %d, %d] ", raiz->info, raiz->fb, nivel);
     }
 }
 
@@ -352,22 +351,47 @@ void imprime(AVL* raiz){
     if(estaVazia(raiz)){
         printf("Arvore Vazia!\n");
         return;
-    }
-    //printf("\nEm Ordem: [INFO, FB, NIVEL]\n"); 
+    } 
     printf("\nEm Ordem: [INFO, FB, NIVEL, altura]\n"); 
     em_ordem(*raiz, 0);
-    //printf("\nPre Ordem: "); pre_ordem(*raiz, 0);
-    //printf("\nPos Ordem: "); pos_ordem(*raiz, 0);
     printf("\n");
 }
+//Complexidade: O(n)
+Funcionario* maiorSalario(NO* raiz){
+    if (raiz != NULL){
+        Funcionario *dir = maiorSalario(raiz->dir);
+        Funcionario *esq = maiorSalario(raiz->esq);
+        Funcionario* maior;
 
-int tamanho(NO* raiz, int inicio){
-    if (raiz == NULL)
-        return 0;
-    int tam = 1;
-    tam += tamanho(raiz->esq, 0);
-    tam += tamanho(raiz->dir, 0);
-    return tam;
+        if (dir == NULL || (esq != NULL && esq->salario > dir->salario))
+            maior = dir;
+        else
+            maior = esq;
+        
+        if (maior == NULL || raiz->funcionario.salario >= maior->salario)
+            return &(raiz->funcionario);
+        else
+            return maior;
+    }
+    return NULL;
 }
+// Complexidade: O(n).
+Funcionario* menorSalario(NO* raiz){
+    if (raiz != NULL){
+        Funcionario *dir = maiorSalario(raiz->dir);
+        Funcionario *esq = maiorSalario(raiz->esq);
+        Funcionario* maior;
 
-#endif  //AVL_H
+        if (dir == NULL || (esq != NULL && esq->salario < dir->salario))
+            maior = dir;
+        else
+            maior = esq;
+        
+        if (maior == NULL || raiz->funcionario.salario <= maior->salario)
+            return &(raiz->funcionario);
+        else
+            return maior;
+    }
+    return NULL;
+}
+#endif
